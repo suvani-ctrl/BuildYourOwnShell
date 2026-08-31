@@ -36,14 +36,10 @@ public class LineReader {
     }
 
     private static boolean isInteractiveInput() throws Exception {
-        if (System.console() != null) {
-            return true;
-        }
-
-        Process process = new ProcessBuilder("stty", "-a")
-                .redirectError(ProcessBuilder.Redirect.DISCARD)
-                .start();
-        return process.waitFor() == 0;
+        // Prefer the presence of a system console. Avoid running `stty -a`
+        // which can return 0 in some non-interactive CI environments and
+        // incorrectly mark the input as interactive.
+        return System.console() != null;
     }
 
     private String readLineRaw() throws Exception {
