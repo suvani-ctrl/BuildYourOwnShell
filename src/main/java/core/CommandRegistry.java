@@ -54,7 +54,7 @@ public class CommandRegistry {
         // Check for external commands
         String executablePath = pathResolver.findExecutable(commandName);
         if (executablePath != null) {
-            return new ExternalCommand(executablePath);
+            return new ExternalCommand(commandName);
         }
 
         return null;
