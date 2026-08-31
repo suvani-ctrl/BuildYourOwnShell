@@ -6,26 +6,30 @@ import java.util.List;
 
 import shell.ShellState;
 
-public class CdCommand implements Command {
-    
+public class CdCommand extends BuiltinCommand {
+
     @Override
     public void execute(List<String> args, ShellState state) {
         String target = args.isEmpty() ? state.getEnv("HOME") : args.get(0);
-        
-        // Expand ~ to home directory
-        if (target != null && target.startsWith("~")) {
+
+        if (target == null || target.isEmpty()) {
+            return;
+        }
+
+        if (target.startsWith("~")) {
             String home = state.getEnv("HOME");
             if (home != null) {
-                target = target.replace("~", home);
+                target = home + target.substring(1);
             }
         }
-        
+
         Path newPath = state.getCurrentDirectory().resolve(target).normalize();
-        
+
         if (Files.isDirectory(newPath)) {
-            state.setCurrentDirectory(newPath);
+            state.setCurrentDirectory(newPath.toAbsolutePath().normalize());
         } else {
-            System.err.println("cd: " + target + ": No such directory");
+            String displayTarget = args.isEmpty() ? target : args.get(0);
+            System.out.println("cd: " + displayTarget + ": No such file or directory");
         }
     }
 }

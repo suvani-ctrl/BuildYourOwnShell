@@ -4,10 +4,10 @@ import java.util.List;
 
 import shell.ShellState;
 
-public class ExitCommand implements Command {
+public class ExitCommand extends BuiltinCommand {
+
     @Override
     public void execute(List<String> args, ShellState state) {
-        System.out.println("Goodbye!");
-        System.exit(0);
+        // Shell loop terminates when CommandExecutor detects ExitCommand.
     }
 }

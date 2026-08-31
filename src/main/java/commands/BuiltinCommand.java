@@ -1,6 +1,14 @@
 package commands;
 
-public class BuiltinCommand{
+import java.util.List;
 
+import shell.ShellState;
 
+/**
+ * Abstract base for all built-in shell commands.
+ */
+public abstract class BuiltinCommand implements Command {
+
+    @Override
+    public abstract void execute(List<String> args, ShellState state) throws Exception;
 }

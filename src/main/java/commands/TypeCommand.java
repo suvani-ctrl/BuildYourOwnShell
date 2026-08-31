@@ -10,7 +10,7 @@ import shell.ShellState;
  * The 'type' built-in command. Reports whether a command is built-in,
  * external, or not found.
  */
-public class TypeCommand implements Command {
+public class TypeCommand extends BuiltinCommand {
 
     private final CommandRegistry registry;
     private final PathResolver pathResolver;
@@ -22,17 +22,22 @@ public class TypeCommand implements Command {
 
     @Override
     public void execute(List<String> args, ShellState state) {
+        if (args.isEmpty()) {
+            return;
+        }
+
         String commandName = args.get(0);
-        
+
         if (registry.isBuiltin(commandName)) {
             System.out.println(commandName + " is a shell builtin");
+            return;
+        }
+
+        String path = pathResolver.findExecutable(commandName);
+        if (path != null) {
+            System.out.println(commandName + " is " + path);
         } else {
-            String path = pathResolver.findExecutable(commandName);
-            if (path != null) {
-                System.out.println(commandName + " is " + path);
-            } else {
-                System.out.println(commandName + ": not found");
-            }
+            System.out.println(commandName + ": not found");
         }
     }
 }
