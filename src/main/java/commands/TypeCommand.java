@@ -4,7 +4,9 @@ import java.util.List;
 
 import core.CommandRegistry;
 import core.PathResolver;
+import shell.ExecutionContext;
 import shell.ShellState;
+import utils.OutputWriter;
 
 /**
  * The 'type' built-in command. Reports whether a command is built-in,
@@ -21,7 +23,7 @@ public class TypeCommand extends BuiltinCommand {
     }
 
     @Override
-    public void execute(List<String> args, ShellState state) {
+    public void execute(List<String> args, ShellState state, ExecutionContext context) throws Exception {
         if (args.isEmpty()) {
             return;
         }
@@ -29,15 +31,15 @@ public class TypeCommand extends BuiltinCommand {
         String commandName = args.get(0);
 
         if (registry.isBuiltin(commandName)) {
-            System.out.println(commandName + " is a shell builtin");
+            OutputWriter.println(commandName + " is a shell builtin", context);
             return;
         }
 
         String path = pathResolver.findExecutable(commandName);
         if (path != null) {
-            System.out.println(commandName + " is " + path);
+            OutputWriter.println(commandName + " is " + path, context);
         } else {
-            System.out.println(commandName + ": not found");
+            OutputWriter.println(commandName + ": not found", context);
         }
     }
 }

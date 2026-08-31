@@ -2,7 +2,10 @@ package core;
 
 import commands.Command;
 import commands.ExitCommand;
+import shell.ExecutionContext;
 import shell.ShellState;
+import utils.CommandLineParser;
+import utils.CommandLineParser.ParsedCommand;
 import utils.Tokenizer;
 
 import java.util.List;
@@ -30,8 +33,10 @@ public class CommandExecutor {
             return Result.CONTINUE;
         }
 
-        String commandName = tokens.get(0);
-        List<String> args = tokens.subList(1, tokens.size());
+        ParsedCommand parsed = CommandLineParser.parse(tokens);
+        String commandName = parsed.commandName();
+        List<String> args = parsed.args();
+        ExecutionContext context = new ExecutionContext(parsed.stdoutFile(), parsed.append());
 
         Command command = registry.getCommand(commandName);
         if (command == null) {
@@ -39,7 +44,7 @@ public class CommandExecutor {
             return Result.CONTINUE;
         }
 
-        command.execute(args, state);
+        command.execute(args, state, context);
 
         if (command instanceof ExitCommand) {
             return Result.EXIT;

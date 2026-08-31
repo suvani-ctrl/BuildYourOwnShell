@@ -2,6 +2,7 @@ package commands;
 
 import java.util.List;
 
+import shell.ExecutionContext;
 import shell.ShellState;
 
 /**
@@ -10,5 +11,5 @@ import shell.ShellState;
 public abstract class BuiltinCommand implements Command {
 
     @Override
-    public abstract void execute(List<String> args, ShellState state) throws Exception;
+    public abstract void execute(List<String> args, ShellState state, ExecutionContext context) throws Exception;
 }
