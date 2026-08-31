@@ -73,6 +73,10 @@ public class LineReader {
                     line.append(suffix);
                     System.out.print("\r\033[2K" + PROMPT + line.toString());
                     System.out.flush();
+                } else {
+                    // No single completion: ring the bell to indicate failure
+                    System.out.print("\007");
+                    System.out.flush();
                 }
                 continue;
             }
