@@ -6,6 +6,7 @@ import shell.ExecutionContext;
 import shell.ShellState;
 import utils.CommandLineParser;
 import utils.CommandLineParser.ParsedCommand;
+import utils.RedirectFilePreparer;
 import utils.Tokenizer;
 
 import java.util.List;
@@ -48,6 +49,7 @@ public class CommandExecutor {
             return Result.CONTINUE;
         }
 
+        RedirectFilePreparer.prepare(context);
         command.execute(args, state, context);
 
         if (command instanceof ExitCommand) {
