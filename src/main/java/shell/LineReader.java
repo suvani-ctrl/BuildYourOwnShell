@@ -65,7 +65,7 @@ public class LineReader {
                 if (completion != null) {
                     line.setLength(0);
                     line.append(completion);
-                    System.out.print("\r" + PROMPT + completion);
+                    System.out.print("\r\033[2K" + PROMPT + completion);
                     System.out.flush();
                 }
                 continue;
