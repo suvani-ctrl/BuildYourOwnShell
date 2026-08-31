@@ -68,6 +68,38 @@ public final class CommandLineParser {
                 }
             }
 
+            if ("1>>".equals(token)) {
+                if (i + 1 < tokens.size()) {
+                    stdoutFile = tokens.get(++i);
+                    stdoutAppend = true;
+                }
+                continue;
+            }
+
+            if ("1>".equals(token)) {
+                if (i + 1 < tokens.size()) {
+                    stdoutFile = tokens.get(++i);
+                    stdoutAppend = false;
+                }
+                continue;
+            }
+
+            if ("1".equals(token) && i + 1 < tokens.size()) {
+                String next = tokens.get(i + 1);
+                if (">>".equals(next) && i + 2 < tokens.size()) {
+                    stdoutFile = tokens.get(i + 2);
+                    stdoutAppend = true;
+                    i += 2;
+                    continue;
+                }
+                if (">".equals(next) && i + 2 < tokens.size()) {
+                    stdoutFile = tokens.get(i + 2);
+                    stdoutAppend = false;
+                    i += 2;
+                    continue;
+                }
+            }
+
             if (">>".equals(token)) {
                 if (i + 1 < tokens.size()) {
                     stdoutFile = tokens.get(++i);
