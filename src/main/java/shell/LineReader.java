@@ -61,11 +61,17 @@ public class LineReader {
             }
 
             if (key == '\t') {
-                String completion = completer.complete(line.toString());
+                String prefix = line.toString();
+                String completion = completer.complete(prefix);
                 if (completion != null) {
-                    line.setLength(0);
-                    line.append(completion);
-                    System.out.print("\r\033[2K" + PROMPT + completion);
+                    String suffix;
+                    if (completion.startsWith(prefix)) {
+                        suffix = completion.substring(prefix.length());
+                    } else {
+                        suffix = completion;
+                    }
+                    line.append(suffix);
+                    System.out.print("\r\033[2K" + PROMPT + line.toString());
                     System.out.flush();
                 }
                 continue;
