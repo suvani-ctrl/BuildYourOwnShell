@@ -27,17 +27,35 @@ public class ExternalCommand implements Command {
         processBuilder.directory(state.getCurrentDirectory().toFile());
         processBuilder.environment().putAll(state.getEnvironment());
 
-        if (context.hasStdoutRedirect()) {
-            File outputFile = new File(context.getStdoutFile());
-            if (context.isAppend()) {
-                processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile));
-            } else {
-                processBuilder.redirectOutput(outputFile);
-            }
-            processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-            processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        } else {
+        boolean hasStdoutRedirect = context.hasStdoutRedirect();
+        boolean hasStderrRedirect = context.hasStderrRedirect();
+
+        if (!hasStdoutRedirect && !hasStderrRedirect) {
             processBuilder.inheritIO();
+        } else {
+            processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT);
+
+            if (hasStdoutRedirect) {
+                File outputFile = new File(context.getStdoutFile());
+                if (context.isStdoutAppend()) {
+                    processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile));
+                } else {
+                    processBuilder.redirectOutput(outputFile);
+                }
+            } else {
+                processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            }
+
+            if (hasStderrRedirect) {
+                File errorFile = new File(context.getStderrFile());
+                if (context.isStderrAppend()) {
+                    processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(errorFile));
+                } else {
+                    processBuilder.redirectError(errorFile);
+                }
+            } else {
+                processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+            }
         }
 
         Process process = processBuilder.start();

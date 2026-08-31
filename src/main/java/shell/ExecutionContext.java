@@ -1,20 +1,28 @@
 package shell;
 
 /**
- * Carries per-invocation execution options such as stdout redirection.
+ * Carries per-invocation execution options such as stdout/stderr redirection.
  */
 public final class ExecutionContext {
 
     private final String stdoutFile;
-    private final boolean append;
+    private final boolean stdoutAppend;
+    private final String stderrFile;
+    private final boolean stderrAppend;
 
-    public ExecutionContext(String stdoutFile, boolean append) {
+    public ExecutionContext(
+            String stdoutFile,
+            boolean stdoutAppend,
+            String stderrFile,
+            boolean stderrAppend) {
         this.stdoutFile = stdoutFile;
-        this.append = append;
+        this.stdoutAppend = stdoutAppend;
+        this.stderrFile = stderrFile;
+        this.stderrAppend = stderrAppend;
     }
 
     public static ExecutionContext none() {
-        return new ExecutionContext(null, false);
+        return new ExecutionContext(null, false, null, false);
     }
 
     public boolean hasStdoutRedirect() {
@@ -25,7 +33,19 @@ public final class ExecutionContext {
         return stdoutFile;
     }
 
-    public boolean isAppend() {
-        return append;
+    public boolean isStdoutAppend() {
+        return stdoutAppend;
+    }
+
+    public boolean hasStderrRedirect() {
+        return stderrFile != null;
+    }
+
+    public String getStderrFile() {
+        return stderrFile;
+    }
+
+    public boolean isStderrAppend() {
+        return stderrAppend;
     }
 }

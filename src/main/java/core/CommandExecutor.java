@@ -36,7 +36,11 @@ public class CommandExecutor {
         ParsedCommand parsed = CommandLineParser.parse(tokens);
         String commandName = parsed.commandName();
         List<String> args = parsed.args();
-        ExecutionContext context = new ExecutionContext(parsed.stdoutFile(), parsed.append());
+        ExecutionContext context = new ExecutionContext(
+                parsed.stdoutFile(),
+                parsed.stdoutAppend(),
+                parsed.stderrFile(),
+                parsed.stderrAppend());
 
         Command command = registry.getCommand(commandName);
         if (command == null) {

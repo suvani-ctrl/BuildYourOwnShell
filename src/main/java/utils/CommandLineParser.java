@@ -1,11 +1,12 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Parses tokenized input into a command name, arguments, and optional stdout
- * redirection.
+ * or stderr redirection.
  */
 public final class CommandLineParser {
 
@@ -13,7 +14,9 @@ public final class CommandLineParser {
             String commandName,
             List<String> args,
             String stdoutFile,
-            boolean append) {
+            boolean stdoutAppend,
+            String stderrFile,
+            boolean stderrAppend) {
     }
 
     private CommandLineParser() {
@@ -21,47 +24,84 @@ public final class CommandLineParser {
 
     public static ParsedCommand parse(List<String> tokens) {
         if (tokens.isEmpty()) {
-            return new ParsedCommand("", Collections.emptyList(), null, false);
+            return emptyParsed();
         }
 
-        int redirectIndex = -1;
-        boolean append = false;
+        List<String> commandTokens = new ArrayList<>();
+        String stdoutFile = null;
+        boolean stdoutAppend = false;
+        String stderrFile = null;
+        boolean stderrAppend = false;
 
         for (int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
-            if (">".equals(token)) {
-                redirectIndex = i;
-                append = false;
-                break;
+
+            if ("2>>".equals(token)) {
+                if (i + 1 < tokens.size()) {
+                    stderrFile = tokens.get(++i);
+                    stderrAppend = true;
+                }
+                continue;
             }
+
+            if ("2>".equals(token)) {
+                if (i + 1 < tokens.size()) {
+                    stderrFile = tokens.get(++i);
+                    stderrAppend = false;
+                }
+                continue;
+            }
+
+            if ("2".equals(token) && i + 1 < tokens.size()) {
+                String next = tokens.get(i + 1);
+                if (">>".equals(next) && i + 2 < tokens.size()) {
+                    stderrFile = tokens.get(i + 2);
+                    stderrAppend = true;
+                    i += 2;
+                    continue;
+                }
+                if (">".equals(next) && i + 2 < tokens.size()) {
+                    stderrFile = tokens.get(i + 2);
+                    stderrAppend = false;
+                    i += 2;
+                    continue;
+                }
+            }
+
             if (">>".equals(token)) {
-                redirectIndex = i;
-                append = true;
-                break;
+                if (i + 1 < tokens.size()) {
+                    stdoutFile = tokens.get(++i);
+                    stdoutAppend = true;
+                }
+                continue;
             }
+
+            if (">".equals(token)) {
+                if (i + 1 < tokens.size()) {
+                    stdoutFile = tokens.get(++i);
+                    stdoutAppend = false;
+                }
+                continue;
+            }
+
+            commandTokens.add(token);
         }
 
-        if (redirectIndex == -1) {
-            return new ParsedCommand(
-                    tokens.get(0),
-                    List.copyOf(tokens.subList(1, tokens.size())),
-                    null,
-                    false);
-        }
-
-        String stdoutFile = redirectIndex + 1 < tokens.size()
-                ? tokens.get(redirectIndex + 1)
-                : null;
-
-        List<String> commandTokens = tokens.subList(0, redirectIndex);
         if (commandTokens.isEmpty()) {
-            return new ParsedCommand("", Collections.emptyList(), stdoutFile, append);
+            return new ParsedCommand("", Collections.emptyList(),
+                    stdoutFile, stdoutAppend, stderrFile, stderrAppend);
         }
 
         return new ParsedCommand(
                 commandTokens.get(0),
                 List.copyOf(commandTokens.subList(1, commandTokens.size())),
                 stdoutFile,
-                append);
+                stdoutAppend,
+                stderrFile,
+                stderrAppend);
+    }
+
+    private static ParsedCommand emptyParsed() {
+        return new ParsedCommand("", Collections.emptyList(), null, false, null, false);
     }
 }

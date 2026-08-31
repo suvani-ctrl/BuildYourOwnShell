@@ -6,11 +6,12 @@ import java.util.List;
 
 import shell.ExecutionContext;
 import shell.ShellState;
+import utils.OutputWriter;
 
 public class CdCommand extends BuiltinCommand {
 
     @Override
-    public void execute(List<String> args, ShellState state, ExecutionContext context) {
+    public void execute(List<String> args, ShellState state, ExecutionContext context) throws Exception {
         String target = args.isEmpty() ? state.getEnv("HOME") : args.get(0);
 
         if (target == null || target.isEmpty()) {
@@ -30,7 +31,7 @@ public class CdCommand extends BuiltinCommand {
             state.setCurrentDirectory(newPath.toAbsolutePath().normalize());
         } else {
             String displayTarget = args.isEmpty() ? target : args.get(0);
-            System.out.println("cd: " + displayTarget + ": No such file or directory");
+            OutputWriter.printErrln("cd: " + displayTarget + ": No such file or directory", context);
         }
     }
 }

@@ -14,15 +14,26 @@ public final class OutputWriter {
 
     public static void println(String message, ExecutionContext context) throws IOException {
         if (context.hasStdoutRedirect()) {
-            Path path = Path.of(context.getStdoutFile());
-            String line = message + "\n";
-            if (context.isAppend()) {
-                Files.writeString(path, line, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            } else {
-                Files.writeString(path, line, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            }
+            writeToFile(message + "\n", context.getStdoutFile(), context.isStdoutAppend());
         } else {
             System.out.println(message);
+        }
+    }
+
+    public static void printErrln(String message, ExecutionContext context) throws IOException {
+        if (context.hasStderrRedirect()) {
+            writeToFile(message + "\n", context.getStderrFile(), context.isStderrAppend());
+        } else {
+            System.err.println(message);
+        }
+    }
+
+    private static void writeToFile(String content, String filePath, boolean append) throws IOException {
+        Path path = Path.of(filePath);
+        if (append) {
+            Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } else {
+            Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
     }
 }
