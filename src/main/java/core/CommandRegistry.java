@@ -8,7 +8,10 @@ import commands.ExitCommand;
 import commands.TypeCommand;
 import commands.ExternalCommand;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,5 +65,16 @@ public class CommandRegistry {
 
     public boolean isBuiltin(String commandName) {
         return builtinCommands.containsKey(commandName);
+    }
+
+    public List<String> getMatchingCommandNames(String prefix) {
+        List<String> matches = new ArrayList<>();
+        for (String name : builtinCommands.keySet()) {
+            if (name.startsWith(prefix)) {
+                matches.add(name);
+            }
+        }
+        Collections.sort(matches);
+        return matches;
     }
 }

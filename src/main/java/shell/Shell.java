@@ -1,12 +1,9 @@
 package shell;
 
+import core.CommandCompleter;
 import core.CommandExecutor;
 import core.CommandRegistry;
 import core.PathResolver;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * REPL loop for the shell. Reads input, delegates to CommandExecutor, and
@@ -17,6 +14,7 @@ public class Shell {
     private static final String PROMPT = "$ ";
 
     private final CommandExecutor executor;
+    private final LineReader lineReader;
     private final ShellState state;
 
     public Shell() {
@@ -24,18 +22,16 @@ public class Shell {
         CommandRegistry registry = new CommandRegistry(pathResolver);
         registry.registerTypeCommand();
         this.executor = new CommandExecutor(registry);
+        this.lineReader = new LineReader(new CommandCompleter(registry));
         this.state = new ShellState();
     }
 
     public void run() throws Exception {
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(System.in, StandardCharsets.UTF_8));
-
         while (true) {
             System.out.print(PROMPT);
             System.out.flush();
 
-            String line = reader.readLine();
+            String line = lineReader.readLine();
             if (line == null) {
                 break;
             }
